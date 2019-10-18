@@ -10,7 +10,7 @@ namespace Project0
         decimal Funds { get; set; }
         int AccountNumber { get; set; }
         void Deposit(decimal amt);
-        void Withdrawl(decimal amt);
+        void Withdraw(decimal amt);
 
     }
 }
