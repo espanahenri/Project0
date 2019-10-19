@@ -4,9 +4,9 @@ using System.Text;
 
 namespace Project0
 {
-    interface IAccount
+    public interface IAccount
     {
-        decimal InterestRate { get; set; }
+        double InterestRate { get; set; }
         decimal Funds { get; set; }
         int AccountNumber { get; set; }
         void Deposit(decimal amt);

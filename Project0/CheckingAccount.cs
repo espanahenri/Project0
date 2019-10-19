@@ -6,7 +6,7 @@ namespace Project0
 {
     class CheckingAccount : IAccount
     {
-        public decimal InterestRate { get; set; }
+        public double InterestRate { get; set; }
         public decimal Funds { get; set; }
         public int AccountNumber { get; set; }
         public void Deposit(decimal amt)

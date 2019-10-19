@@ -4,11 +4,12 @@ using System.Text;
 
 namespace Project0
 {
-    class Customer
+    public class Customer
     {
         public int ID { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public List<IAccount> Accounts { get; set; }
+        public List<IAccount> Accounts = new List<IAccount>();
+        public List<Loan> Loans { get; set; }
     }
 }
