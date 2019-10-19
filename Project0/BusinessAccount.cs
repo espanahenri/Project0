@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Project0
 {
-    class CheckingAccount : IAccount
+    class BusinessAccount : IAccount
     {
         public decimal InterestRate { get; set; }
         public decimal Funds { get; set; }
@@ -15,14 +15,7 @@ namespace Project0
         }
         public void Withdraw(decimal amt)
         {
-            if (Funds > amt)
-            {
-                Funds -= amt;
-            }
-            else
-            {
-                Console.WriteLine("Sorry not enought funds to complete transaccion.");
-            }
+            Funds -= amt;
         }
     }
 }
