@@ -10,11 +10,12 @@ namespace Project0
         public decimal Funds { get; set; }
         public int AccountNumber { get; set; }
         public void Deposit(decimal amt)
-        { 
-            
+        {
+            Funds += amt;
         }
         public void Withdraw(decimal amt)
-        { 
+        {
+            Funds -= amt;
         }
     }
 }
