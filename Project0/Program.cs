@@ -7,7 +7,7 @@ namespace Project0
         static void Main(string[] args)
         {
             UserInterface.Register();
-            UserInterface.DisplayAllCustomers();
+            //UserInterface.DisplayAllCustomers();
         }
     }
 }

@@ -33,13 +33,19 @@ namespace Project0
             _CurrentCustomer = customer;
             _CustomerID++;
             OpenAccount();
+            CustomerHomeScreen(_CurrentCustomer);
         }
         #endregion
-        public static void HomeScreen()
+        public static void CustomerHomeScreen(Customer customer)
         {
             Console.Clear();
-            Console.WriteLine("Welcome to Revature Bank");
+            Console.WriteLine($"Welcome to Revature Bank { customer.FirstName } {customer.LastName}!");
             Console.WriteLine("1. Register");
+            Console.WriteLine("2. Open new account");
+            Console.WriteLine("3. Close account");
+            Console.WriteLine("4. Deposit");
+            Console.WriteLine("5. Transfer");
+            Console.WriteLine("6. List of all accounts");
 
         }
         public static void OpenAccount()
@@ -70,12 +76,13 @@ namespace Project0
             foreach (var customer in _Customers)
             {
                 Console.WriteLine($"First Name: { customer.FirstName } Last Name: { customer.LastName } CustomerID: { customer.ID}");
-                Console.WriteLine("All checking accounts");
+                Console.WriteLine("+++Checking Accounts+++");
                 foreach (var account in customer.Accounts)
                 {
                     Console.WriteLine($"Account Number: { account.AccountNumber } Funds: { account.Funds } " +
                                       $"Current Interest Rate: { account.InterestRate }");
                 }
+                Console.WriteLine("+++Business Accounts+++");
             }
         }
     }
