@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 namespace Project0
 {
@@ -9,6 +10,7 @@ namespace Project0
         public double InterestRate { get; set; }
         public decimal Funds { get; set; }
         public int AccountNumber { get; set; }
+        public List<Transaction> Transactions { get; set; }
         public void Deposit(decimal amt)
         {
             Funds += amt;
@@ -22,6 +24,7 @@ namespace Project0
             else
             {
                 Console.WriteLine("Sorry not enought funds to complete transaccion.");
+                Thread.Sleep(1000);
             }
         }
     }

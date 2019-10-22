@@ -11,6 +11,7 @@ namespace Project0
         int AccountNumber { get; set; }
         void Deposit(decimal amt);
         void Withdraw(decimal amt);
+        public List<Transaction> Transactions { get; set; }
 
     }
 }

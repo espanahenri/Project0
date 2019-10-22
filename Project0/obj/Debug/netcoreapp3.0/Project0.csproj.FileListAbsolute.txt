@@ -4,7 +4,6 @@ C:\Users\Henri\Revature\Workarea\Project0\Project0\bin\Debug\netcoreapp3.0\Proje
 C:\Users\Henri\Revature\Workarea\Project0\Project0\bin\Debug\netcoreapp3.0\Project0.runtimeconfig.dev.json
 C:\Users\Henri\Revature\Workarea\Project0\Project0\bin\Debug\netcoreapp3.0\Project0.dll
 C:\Users\Henri\Revature\Workarea\Project0\Project0\bin\Debug\netcoreapp3.0\Project0.pdb
-C:\Users\Henri\Revature\Workarea\Project0\Project0\obj\Debug\netcoreapp3.0\Project0.csprojAssemblyReference.cache
 C:\Users\Henri\Revature\Workarea\Project0\Project0\obj\Debug\netcoreapp3.0\Project0.AssemblyInfoInputs.cache
 C:\Users\Henri\Revature\Workarea\Project0\Project0\obj\Debug\netcoreapp3.0\Project0.AssemblyInfo.cs
 C:\Users\Henri\Revature\Workarea\Project0\Project0\obj\Debug\netcoreapp3.0\Project0.dll
