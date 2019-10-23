@@ -8,6 +8,7 @@ namespace Project0
     {
         public double InterestRate { get; set; }
         public decimal OverdraftAmount { get; set; }
+        public decimal OverdraftFacility { get; set; }
         public decimal Funds { get; set; }
         public int AccountNumber { get; set; }
         public List<Transaction> Transactions { get; set; }
@@ -19,11 +20,12 @@ namespace Project0
         {
             if (Funds < amt)
             {
-                var _OverdraftFacility = new OverdraftFacility();
+                //var _OverdraftFacility = new OverdraftFacility();
                 OverdraftAmount = amt - Funds;
-                _OverdraftFacility.OverdraftAmount = OverdraftAmount;
-                _OverdraftFacility.CalculateOverdraftPayment();
-                UserInterface._CurrentCustomer.OverdraftFacilities.Add(_OverdraftFacility);
+                OverdraftFacility = OverdraftAmount + (amt * 0.1M);
+                //_OverdraftFacility.OverdraftAmount = OverdraftAmount;
+                //_OverdraftFacility.CalculateOverdraftPayment();
+                //UserInterface._CurrentCustomer.OverdraftFacilities.Add(_OverdraftFacility);
                 Funds = 0;
             }
             else
@@ -31,5 +33,6 @@ namespace Project0
                 Funds -= amt;
             }
         }
+        
     }
 }

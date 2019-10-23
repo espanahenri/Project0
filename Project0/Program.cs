@@ -7,6 +7,7 @@ namespace Project0
         static void Main(string[] args)
         {
             UserInterface.RegisterScreen();
+           
             //Customer cust1 = new Customer()
             //{
             //    FirstName = "Henri",

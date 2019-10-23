@@ -17,14 +17,16 @@ namespace Project0
         }
         public void Withdraw(decimal amt)
         {
-            if (Funds > amt)
+            if (Funds >= amt)
             {
                 Funds -= amt;
             }
             else
             {
                 Console.WriteLine("Sorry not enought funds to complete transaccion.");
-                Thread.Sleep(1000);
+                Console.WriteLine("Press enter to go back home.");
+                Console.ReadLine();
+                UserInterface.CustomerHomeScreen();
             }
         }
     }
