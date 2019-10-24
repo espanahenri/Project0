@@ -5,6 +5,7 @@ using System.Threading;
 using System.Linq;
 namespace Project0
 {
+    public delegate void ScreenDelegate();
     public static class UserInterface
     {
         public static int _TransactionID = 5000;
@@ -26,7 +27,8 @@ namespace Project0
             Withdraw = 5,
             ListAllAccounts = 7,
             DisplayTransaccions = 8,
-            Exit = 9
+            PayOverdraft = 9,
+            Exit = 10
         };
 
         #region Register Page
@@ -66,8 +68,8 @@ namespace Project0
             Console.WriteLine("6. Transfer");
             Console.WriteLine("7. List of all my accounts");
             Console.WriteLine("8. Display Transaccions for an account");
-            Console.WriteLine("9. Exit");
-            //var selection = Convert.ToInt32(Console.ReadLine());
+            Console.WriteLine("9. Pay Overdraft Facility");
+            Console.WriteLine("10. Exit");
             int selection;
             var input = Console.ReadLine();
             bool checknumber = Int32.TryParse(input, out selection);
@@ -95,6 +97,10 @@ namespace Project0
                 case (int)_HomeScreenSelector.ListAllAccounts:
                     DisplayAllCustomerAccountsScreen();
                     break;
+                case (int)_HomeScreenSelector.PayOverdraft:
+                    PayOverdraftScreen();
+                    break;
+
                 case (int)_HomeScreenSelector.Exit:
                     Environment.Exit(0);
                     break;
@@ -138,15 +144,24 @@ namespace Project0
         public static void DepositScreen()
         {
             Console.Clear();
+            var del = new ScreenDelegate(DepositScreen);
+            decimal amount;
+            int accountnumber;
+            CheckAccountsExist();
+            Console.WriteLine("+++Deposit+++");
             Console.WriteLine("Select account you want to deposit into:");
             DisplayAllCustomerAccounts();
             Console.WriteLine("Please type in account number you want to deposit in to.");
-            var accountnumber = Convert.ToInt32(Console.ReadLine());
-            var account = AccountSelector(accountnumber);
+            var input = Console.ReadLine();
+            AccountNumberVerifier(input, out accountnumber,del);
+            AccountNumberExist(accountnumber, del);
+            var account = (IAccountV1)AccountSelector(accountnumber);
             Console.WriteLine("How much do you want to deposit?");
-            var amt = Convert.ToDecimal(Console.ReadLine());
-            DepositAccount(account, amt);
-            Console.WriteLine($"Thank you, your deposit of ${amt} for account: {account.AccountNumber } was successful");
+            var input1 = Console.ReadLine();
+            VerifyAmount(input1, out amount, del);
+            
+           DepositAccount(account, amount);
+            Console.WriteLine($"Thank you, your deposit of ${amount} for account: {account.AccountNumber } was successful");
             Console.WriteLine("Please press enter to go back home.");
             Console.ReadLine();
             CustomerHomeScreen();     
@@ -154,59 +169,64 @@ namespace Project0
         public static void WithdrawScreen()
         {
             Console.Clear();
-            
+
+            var del = new ScreenDelegate(WithdrawScreen);
             decimal amount = 0.0m;
             int accountnumber;
 
             CheckAccountsExist();
             Console.WriteLine(" +++WITHDRAW+++");
             Console.WriteLine("Select the account");
-                DisplayAllCustomerAccounts();
-                Console.WriteLine("Type the number of the account.");
-                var input = Console.ReadLine();
-                bool checknumber = Int32.TryParse(input, out accountnumber);
-                if (!checknumber)
-                {
-                    Console.WriteLine("Incorrect input type try again!");
-                    Thread.Sleep(1000);
-                    WithdrawScreen();
-                }
-                else 
-                {
-                    if (AccountNumberVerifier(accountnumber))
-                    {
-                        Console.WriteLine("How much would you like to withdraw?");
-                        input = Console.ReadLine();
-                        if(VerifyAmount(input, out amount))
-                        {
-                            AccountSelector(accountnumber).Withdraw(amount);
-                            Console.WriteLine("Withdraw was successful!");
-                            Console.WriteLine("Press enter to go back home.");
-                            Console.ReadLine();
-                            CustomerHomeScreen();
-                        }
-                        Console.WriteLine("Not valid amount.");
-                        Thread.Sleep(1000);
-                        WithdrawScreen();
-                        
-                    }
-                    else
-                    {
-                        Console.WriteLine("Sorry account number not valid. Try again");
-                        Thread.Sleep(1000);
-                        WithdrawScreen();
-                    }
-                }        
+            DisplayAllCustomerAccounts();
+            Console.WriteLine("Type the number of the account.");
+            var input = Console.ReadLine();
+            AccountNumberVerifier(input, out accountnumber, del);
+            AccountNumberExist(accountnumber, del);
+            var account = (IAccountV1)AccountSelector(accountnumber);
+            Console.WriteLine("How much would you like to withdraw?");
+            input = Console.ReadLine();
+            VerifyAmount(input, out amount, del);
+            account.Withdraw(amount);
+            Console.WriteLine($"Thank you, your withdraw of ${amount} for account: {account.AccountNumber } was successful");
+            Console.WriteLine("Please press enter to go back home.");
+            Console.ReadLine();
+            CustomerHomeScreen();
         }
-        
         public static void CloseAccountScreen()
         {
             Console.Clear();
-            Console.WriteLine("Select account you want to close:");
+            int accountnumber;
+            var del = new ScreenDelegate(CloseAccountScreen);
+            CheckAccountsExist();
+            Console.WriteLine("+++Close Account+++");
             DisplayAllCustomerAccounts();
-            var accountnumber = Convert.ToInt32(Console.ReadLine());
+            Console.WriteLine("Type in the account number you want to close");
+            var input = Console.ReadLine();
+            AccountNumberVerifier(input, out accountnumber, del);
+            AccountNumberExist(accountnumber, del);
             CloseAccount(accountnumber);
+            Console.WriteLine("You have successfully closed your account.");
+            Console.WriteLine("Press Enter to go home.");
+            Console.ReadLine();
             CustomerHomeScreen();
+        }
+        public static void PayOverdraftScreen()
+        {
+            Console.Clear();
+            if (_CurrentCustomer.OverdraftFacilityDue > 0) 
+            {
+                Console.WriteLine("+++Pay Overdraft Facility+++");
+                Console.WriteLine($"This is how much you owe: ${ _CurrentCustomer.OverdraftFacilityDue}");
+                Console.WriteLine("Press enter to go back home");
+                Console.ReadLine();
+                CustomerHomeScreen();
+            }
+            Console.WriteLine("You dont owe any Overdraft Facilities.");
+
+            Console.WriteLine("Press enter to go back home");
+            Console.ReadLine();
+            CustomerHomeScreen();
+
         }
         //public static void TransferScreen()
         //{
@@ -264,13 +284,13 @@ namespace Project0
             Console.WriteLine("         +++Checking Accounts+++");
             foreach (var account in _CurrentCustomer.Accounts.OfType<CheckingAccount>())
             {
-                Console.WriteLine($"Account Number: { account.AccountNumber } Funds: { account.Funds } " +
+                Console.WriteLine($"Account Number: { account.AccountNumber } Balance: ${ account.Balance } " +
                                   $"Current Interest Rate: { account.InterestRate }");
             }
             Console.WriteLine("         +++Business Accounts+++");
             foreach (var account in _CurrentCustomer.Accounts.OfType<BusinessAccount>())
             {
-                Console.WriteLine($"Account Number: { account.AccountNumber } Funds: { account.Funds } " +
+                Console.WriteLine($"Account Number: { account.AccountNumber } Balance: ${ account.Balance } " +
                                   $"Current Interest Rate: { account.InterestRate }");
             }
             Console.WriteLine("Press enter to go back to home screen.");
@@ -282,10 +302,10 @@ namespace Project0
             var account = new BusinessAccount()
             {
                 AccountNumber = _BusinessAccountNumber,
-                Funds = 0.0M,
+                Balance = 0.0M,
                 InterestRate = 0.0
             };
-            //_CurrentCustomer.BusinessAccounts.Add(account);
+            
             _CurrentCustomer.Accounts.Add(account);
             _BusinessAccountNumber++;
             CustomerHomeScreen();
@@ -295,7 +315,7 @@ namespace Project0
             var account = new CheckingAccount()
             {
                 AccountNumber = _CheckingAccountNumber,
-                Funds = 0.0M,
+                Balance = 0.0M,
                 InterestRate = 0.0
             };
            // _CurrentCustomer.CheckingAccounts.Add(account);
@@ -308,10 +328,6 @@ namespace Project0
             var account = AccountSelector(accountnumber);
             _CurrentCustomer.Accounts.Remove(account);
         }
-        public static void ProcessTransfer()
-        { 
-            
-        }
         public static void DisplayAllCustomerAccounts()
         {
             
@@ -320,13 +336,13 @@ namespace Project0
                 Console.WriteLine("         +++Checking Accounts+++");
                 foreach (var account in _CurrentCustomer.Accounts.OfType<CheckingAccount>())
                 {
-                    Console.WriteLine($"Account Number: { account.AccountNumber } Funds: { account.Funds } " +
+                    Console.WriteLine($"Account Number: { account.AccountNumber } Balance: ${ account.Balance } " +
                                       $"Current Interest Rate: { account.InterestRate }");
                 }
                 Console.WriteLine("         +++Business Accounts+++");
                 foreach (var account in _CurrentCustomer.Accounts.OfType<BusinessAccount>())
                 {
-                    Console.WriteLine($"Account Number: { account.AccountNumber } Funds: { account.Funds } " +
+                    Console.WriteLine($"Account Number: { account.AccountNumber } Balance: ${ account.Balance } " +
                                       $"Current Interest Rate: { account.InterestRate }");
                 }
             
@@ -336,42 +352,54 @@ namespace Project0
             var account = _CurrentCustomer.Accounts.First(account => account.AccountNumber == accountnumber);
             return account;
         }
-        public static void DepositAccount(IAccount account, decimal amt)
+        public static void DepositAccount(IAccountV1 account, decimal amt)
         {
             account.Deposit(amt);
         }
-        private static bool HaveAccounts()
-        {
-            var result = false;
-            if (_CurrentCustomer.Accounts.Count > 0)
-            {
-                result = true;
-            }
-            return result;
-        }
         private static void CheckAccountsExist()
         {
-            if (!HaveAccounts())
+            if (!(_CurrentCustomer.Accounts.Count > 0))
             {
-                Console.WriteLine("No accounts found create an account. Try again");
+                Console.WriteLine("No accounts found please create an account. Try again.");
                 Thread.Sleep(2000);
                 CustomerHomeScreen();
             }
         }
-        private static bool VerifyAmount(string input, out decimal amount)
+        private static void VerifyAmount(string input, out decimal amount,ScreenDelegate del)
         {
-           
-            //bool checknumber = Int32.TryParse(input, out selection);
-            //input = Console.ReadLine();
             bool checknumber = Decimal.TryParse(input, out amount);
-            return checknumber;
+            if (amount < 0)
+            {
+                Console.WriteLine("Amount cannot be less than zero.");
+                Thread.Sleep(2000);
+                del();
+            }
+            if (checknumber == false)
+            {
+                Console.WriteLine("Not a correct value. Try again.");
+                Thread.Sleep(2000);
+                del();
+            }
         }
-        public static bool AccountNumberVerifier(int accountnumber)
+        private static void AccountNumberVerifier(string input, out int accountnumber, ScreenDelegate del)
         {
-            var status = false;
-            status = _CurrentCustomer.Accounts.Any(account => account.AccountNumber == accountnumber);
-            return status;
-            
+            bool checknumber = int.TryParse(input, out accountnumber);
+            if (checknumber == false )
+            {
+                Console.WriteLine("Not a correct value. Try again");
+                Thread.Sleep(2000);
+                del();
+            }
+        }
+        public static void AccountNumberExist(int accountnumber, ScreenDelegate del)
+        {
+                
+            if (!(_CurrentCustomer.Accounts.Any(account => account.AccountNumber == accountnumber)))
+            {
+                Console.WriteLine("Account number not found. Try again.");
+                Thread.Sleep(2000);
+                del();
+            }
         }
     }
 }

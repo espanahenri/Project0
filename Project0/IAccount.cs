@@ -7,11 +7,10 @@ namespace Project0
     public interface IAccount
     {
         double InterestRate { get; set; }
-        decimal Funds { get; set; }
+        decimal Balance { get; set; }
         int AccountNumber { get; set; }
-        void Deposit(decimal amt);
-        void Withdraw(decimal amt);
         public List<Transaction> Transactions { get; set; }
+       
 
     }
 }

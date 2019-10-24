@@ -5,21 +5,21 @@ using System.Threading;
 
 namespace Project0
 {
-    class CheckingAccount : IAccount
+    class CheckingAccount : IAccountV1
     {
         public double InterestRate { get; set; }
-        public decimal Funds { get; set; }
+        public decimal Balance { get; set; }
         public int AccountNumber { get; set; }
         public List<Transaction> Transactions { get; set; }
         public void Deposit(decimal amt)
         {
-            Funds += amt;
+            Balance += amt;
         }
         public void Withdraw(decimal amt)
         {
-            if (Funds >= amt)
+            if (Balance >= amt)
             {
-                Funds -= amt;
+                Balance -= amt;
             }
             else
             {
