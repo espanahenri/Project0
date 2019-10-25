@@ -9,6 +9,7 @@ namespace Project0
         double InterestRate { get; set; }
         decimal Balance { get; set; }
         int AccountNumber { get; set; }
+        public bool isActive { get; set; }
         public List<Transaction> Transactions { get; set; }
        
 

@@ -9,6 +9,8 @@ namespace Project0
         public int ID { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        public bool isActive { get; set; }
+
         public List<IAccount> Accounts = new List<IAccount>();
         public List<Loan> Loans { get; set; }
         public decimal OverdraftFacilityDue { get; set; }
@@ -21,8 +23,8 @@ namespace Project0
             var transaction = new Transaction()
             {
                 TransactionID = UserInterface._TransactionID,
-                AccountFrom = acc1,
-                AccountTo = acc2
+                //AccountFrom = acc1,
+                //AccountTo = acc2
             };
             acc1.Transactions.Add(transaction);
             acc2.Transactions.Add(transaction);

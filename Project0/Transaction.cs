@@ -8,7 +8,8 @@ namespace Project0
     {
         public int TransactionID { get; set; }
         public string TypeOfTransaction { get; set; }
-        public IAccount AccountFrom { get; set; }
-        public IAccount AccountTo { get; set; }
+        public decimal Amount { get; set; }
+        public DateTime TimeOfTransaction { get; set; }
+        public int AccountNumber { get; set; }
     }
 }

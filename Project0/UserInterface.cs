@@ -6,6 +6,12 @@ using System.Linq;
 namespace Project0
 {
     public delegate void ScreenDelegate();
+    /// <summary>
+    /// User interface controls and handles all banking operations for a single customer at a time.
+    /// Which include keeping track of current customer and actions of current customer.
+    /// Data validation is also handled in this class depending on the request a specific
+    /// function is called.
+    /// </summary>
     public static class UserInterface
     {
         public static int _TransactionID = 5000;
@@ -46,7 +52,8 @@ namespace Project0
             {
                 ID = _CustomerID,
                 FirstName = firstname,
-                LastName = lastname
+                LastName = lastname,
+                isActive = true
             };
             _Customers.Add(customer);
             _CurrentCustomer = customer;
@@ -97,6 +104,9 @@ namespace Project0
                 case (int)_HomeScreenSelector.ListAllAccounts:
                     DisplayAllCustomerAccountsScreen();
                     break;
+                case (int)_HomeScreenSelector.DisplayTransaccions:
+                    DisplayTransactionAccountScreen();
+                    break;
                 case (int)_HomeScreenSelector.PayOverdraft:
                     PayOverdraftScreen();
                     break;
@@ -141,6 +151,7 @@ namespace Project0
                     break;
             }
         }
+        
         public static void DepositScreen()
         {
             Console.Clear();
@@ -157,10 +168,24 @@ namespace Project0
             AccountNumberExist(accountnumber, del);
             var account = (IAccountV1)AccountSelector(accountnumber);
             Console.WriteLine("How much do you want to deposit?");
-            var input1 = Console.ReadLine();
-            VerifyAmount(input1, out amount, del);
+            input = Console.ReadLine();
+            VerifyAmount(input, out amount, del);
             
-           DepositAccount(account, amount);
+            DepositAccount(account, amount);
+            var trans = new Transaction()
+            {
+                TransactionID = _TransactionID,
+                TimeOfTransaction = DateTime.Now,
+                Amount = amount,
+                TypeOfTransaction = "Deposit",
+                AccountNumber = account.AccountNumber
+            };
+            if (account.Transactions == null)
+            {
+                account.Transactions = new List<Transaction>();
+            }
+            account.Transactions.Add(trans);
+            _TransactionID++;
             Console.WriteLine($"Thank you, your deposit of ${amount} for account: {account.AccountNumber } was successful");
             Console.WriteLine("Please press enter to go back home.");
             Console.ReadLine();
@@ -213,16 +238,29 @@ namespace Project0
         public static void PayOverdraftScreen()
         {
             Console.Clear();
+            decimal amount;
+            var del = new ScreenDelegate(PayOverdraftScreen);
             if (_CurrentCustomer.OverdraftFacilityDue > 0) 
             {
                 Console.WriteLine("+++Pay Overdraft Facility+++");
                 Console.WriteLine($"This is how much you owe: ${ _CurrentCustomer.OverdraftFacilityDue}");
+                Console.WriteLine("How much would you like to pay?");
+                var input = Console.ReadLine();
+                VerifyAmount(input, out amount, del);
+                if (amount > _CurrentCustomer.OverdraftFacilityDue)
+                {
+                    Console.WriteLine("Can't pay more than what you owe!");
+                    Console.WriteLine("Press enter to continue.");
+                    Console.ReadLine();
+                    del();
+                }
+                _CurrentCustomer.OverdraftFacilityDue -= amount;
+                Console.WriteLine("Thank you for your payment!");
                 Console.WriteLine("Press enter to go back home");
                 Console.ReadLine();
                 CustomerHomeScreen();
             }
             Console.WriteLine("You dont owe any Overdraft Facilities.");
-
             Console.WriteLine("Press enter to go back home");
             Console.ReadLine();
             CustomerHomeScreen();
@@ -297,13 +335,34 @@ namespace Project0
             Console.ReadLine();
             CustomerHomeScreen();
         }
+        public static void DisplayTransactionAccountScreen()
+        {
+            Console.Clear();
+            var del = new ScreenDelegate(DisplayTransactionAccountScreen);
+            int accountnumber;
+            Console.WriteLine("+++Transactions+++");
+            DisplayAllCustomerAccounts();
+            Console.WriteLine("Please select the account you want to see the transactions for.");
+            var input = Console.ReadLine();
+            AccountNumberVerifier(input,out accountnumber, del);
+            var account = AccountSelector(accountnumber);
+            foreach (var transaction in account.Transactions)
+            {
+                Console.WriteLine($"Transaction Id: {transaction.TransactionID} Type of Transaction: {transaction.TypeOfTransaction} " +
+                                  $"Time: {transaction.TimeOfTransaction} Amount: ${transaction.Amount}");
+            }
+            Console.WriteLine("Please press enter to go back home.");
+            Console.ReadLine();
+            CustomerHomeScreen();
+        }
         private static void OpenBusinessAccount()
         {
             var account = new BusinessAccount()
             {
                 AccountNumber = _BusinessAccountNumber,
                 Balance = 0.0M,
-                InterestRate = 0.0
+                InterestRate = 0.0,
+                isActive = true
             };
             
             _CurrentCustomer.Accounts.Add(account);
@@ -316,9 +375,9 @@ namespace Project0
             {
                 AccountNumber = _CheckingAccountNumber,
                 Balance = 0.0M,
-                InterestRate = 0.0
+                InterestRate = 0.0,
+                isActive = true
             };
-           // _CurrentCustomer.CheckingAccounts.Add(account);
             _CurrentCustomer.Accounts.Add(account);
             _CheckingAccountNumber++;
             CustomerHomeScreen();

@@ -11,6 +11,7 @@ namespace Project0
         public decimal OverdraftFacility { get; set; }
         public decimal Balance { get; set; }
         public int AccountNumber { get; set; }
+        public bool isActive { get; set; }
         public List<Transaction> Transactions { get; set; }
         public void Deposit(decimal amt)
         {
@@ -23,7 +24,7 @@ namespace Project0
                 OverdraftAmount = amt - Balance;
                 OverdraftFacility = OverdraftAmount + (amt * 0.1M);
                 Balance = 0;
-                UserInterface._CurrentCustomer.OverdraftFacilityDue = OverdraftFacility;
+                UserInterface._CurrentCustomer.OverdraftFacilityDue += OverdraftFacility;
                 Console.WriteLine($"Attention: You have added ${OverdraftFacility} to your overdraft facility");
             }
             else

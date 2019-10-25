@@ -10,6 +10,11 @@ namespace Project0
         public decimal Balance { get; set; }
         public int AccountNumber { get; set; }
         public List<Transaction> Transactions { get; set; }
+        public bool isActive { get; set; }
+        public void PayLoanInstallment(decimal amount)
+        {
+            Balance -= amount;  
+        }
         
     }
 }
