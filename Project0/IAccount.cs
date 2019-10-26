@@ -10,8 +10,7 @@ namespace Project0
         decimal Balance { get; set; }
         int AccountNumber { get; set; }
         public bool isActive { get; set; }
-        public List<Transaction> Transactions { get; set; }
-       
+        public List<Transaction> Transactions { get; set; }   
 
     }
 }
