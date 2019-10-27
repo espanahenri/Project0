@@ -395,6 +395,13 @@ namespace Project0
             IntegerNumberVerifier(input, out accountnumberto, del);
             AccountNumberExist(accountnumberto, del);
             CheckLoanType(accountnumberto, del);
+            if (AccountSelector(accountnumberto) is TermDeposit)
+            {
+                Console.WriteLine("Sorry you cannot transfer to a cd.");
+                Console.WriteLine("Press enter to try again.");
+                Console.ReadLine();
+                del();
+            }
             if (accountnumberfrom == accountnumberto)
             {
                 Console.WriteLine("Sorry you cannot transfer to the same account.");
@@ -457,24 +464,28 @@ namespace Project0
                 Console.WriteLine($"Account Number: { account.AccountNumber } Balance: ${ account.Balance } " +
                                   $"Current Interest Rate: { account.InterestRate }");
             }
+            Console.WriteLine();
             Console.WriteLine("         +++Business Accounts+++");
             foreach (var account in _CurrentCustomer.Accounts.OfType<BusinessAccount>())
             {
                 Console.WriteLine($"Account Number: { account.AccountNumber } Balance: ${ account.Balance } " +
                                   $"Current Interest Rate: { account.InterestRate }");
             }
+            Console.WriteLine();
             Console.WriteLine("         +++Loan Accounts+++");
             foreach (var account in _CurrentCustomer.Accounts.OfType<Loan>())
             {
                 Console.WriteLine($"Loan Number: { account.AccountNumber } What you owe: ${ account.FullBalance.ToString("F") } " +
                                   $"Interest Rate: { account.InterestRate * 100 }% Term: {account.Term}years Monthly Payments: ${account.InstallmentAmount.ToString("F")}");
             }
+            Console.WriteLine();
             Console.WriteLine("         +++Term Deposit Accounts+++");
             foreach (var account in _CurrentCustomer.Accounts.OfType<TermDeposit>())
             {
                 Console.WriteLine($"Account Number: { account.AccountNumber } Balance: ${ account.FullBalance } " +
                                   $"Interest Rate: { account.InterestRate * 100 }% Term: {account.Term}years Maturity Date: {account.Maturity}");
             }
+            Console.WriteLine();
             Console.WriteLine("Press enter to go back to home screen.");
             Console.ReadLine();
             CustomerHomeScreen();
@@ -617,18 +628,21 @@ namespace Project0
                     Console.WriteLine($"Account Number: { account.AccountNumber } Balance: ${ account.Balance } " +
                                       $"Current Interest Rate: { account.InterestRate }");
                 }
+            Console.WriteLine();
                 Console.WriteLine("         +++Business Accounts+++");
                 foreach (var account in _CurrentCustomer.Accounts.OfType<BusinessAccount>())
                 {
                     Console.WriteLine($"Account Number: { account.AccountNumber } Balance: ${ account.Balance } " +
                                       $"Current Interest Rate: { account.InterestRate }");
                 }
+            Console.WriteLine();
             Console.WriteLine("         +++Loan Accounts+++");
             foreach (var account in _CurrentCustomer.Accounts.OfType<Loan>())
             {
                 Console.WriteLine($"Loan Number: { account.AccountNumber } What you owe: ${ account.FullBalance.ToString("F") } " +
                                   $"Interest Rate: { account.InterestRate * 100 }% Term: {account.Term} years Monthly Payments: ${account.InstallmentAmount.ToString("F")}");
             }
+            Console.WriteLine();
             Console.WriteLine("         +++Term Deposit Accounts+++");
                 foreach (var account in _CurrentCustomer.Accounts.OfType<TermDeposit>())
                 {
