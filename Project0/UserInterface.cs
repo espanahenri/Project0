@@ -71,7 +71,7 @@ namespace Project0
             _CurrentCustomer = customer;
             _CustomerID++;
             OpenAccountScreen();
-            //CustomerHomeScreen(_CurrentCustomer);
+            
         }
         #endregion
         public static void CustomerHomeScreen()
@@ -86,7 +86,7 @@ namespace Project0
             Console.WriteLine("5. Withdraw");
             Console.WriteLine("6. Transfer");
             Console.WriteLine("7. List of all my accounts");
-            Console.WriteLine("8. Display Transaccions for an account");
+            Console.WriteLine("8. Display Transactions for an account");
             Console.WriteLine("9. Pay Overdraft Facility");
             Console.WriteLine("10. Pay Loan Installment");
             Console.WriteLine("11. Exit");
@@ -192,6 +192,14 @@ namespace Project0
             var input = Console.ReadLine();
             IntegerNumberVerifier(input, out accountnumber,del);
             AccountNumberExist(accountnumber, del);
+            CheckLoanType(accountnumber);
+            if (AccountSelector(accountnumber) is TermDeposit)
+            {
+                Console.WriteLine("Sorry you cannot transfer to a cd.");
+                Console.WriteLine("Press enter to try again.");
+                Console.ReadLine();
+                CustomerHomeScreen();
+            }
             var account = (IAccountV1)AccountSelector(accountnumber);
             Console.WriteLine("How much do you want to deposit?");
             input = Console.ReadLine();
@@ -233,6 +241,7 @@ namespace Project0
             var input = Console.ReadLine();
             IntegerNumberVerifier(input, out accountnumber, del);
             AccountNumberExist(accountnumber, del);
+            CheckLoanType(accountnumber);
             var account = (IAccountV1)AccountSelector(accountnumber);
             Console.WriteLine("How much would you like to withdraw?");
             input = Console.ReadLine();
@@ -389,12 +398,12 @@ namespace Project0
             var input = Console.ReadLine();
             IntegerNumberVerifier(input, out accountnumberfrom, del);
             AccountNumberExist(accountnumberfrom, del);
-            CheckLoanType(accountnumberfrom, del);
+            CheckLoanType(accountnumberfrom);
             Console.WriteLine("Type the account number where you want to transfer to.");
             input = Console.ReadLine();
             IntegerNumberVerifier(input, out accountnumberto, del);
             AccountNumberExist(accountnumberto, del);
-            CheckLoanType(accountnumberto, del);
+            CheckLoanType(accountnumberto);
             if (AccountSelector(accountnumberto) is TermDeposit)
             {
                 Console.WriteLine("Sorry you cannot transfer to a cd.");
@@ -519,7 +528,8 @@ namespace Project0
                 AccountNumber = _BusinessAccountNumber,
                 Balance = 0.0M,
                 InterestRate = 0.0,
-                isActive = true
+                isActive = true,
+                Transactions = new List<Transaction>()
             };
             
             _CurrentCustomer.Accounts.Add(account);
@@ -533,7 +543,8 @@ namespace Project0
                 AccountNumber = _CheckingAccountNumber,
                 Balance = 0.0M,
                 InterestRate = 0.0,
-                isActive = true
+                isActive = true,
+                Transactions = new List<Transaction>()
             };
             _CurrentCustomer.Accounts.Add(account);
             _CheckingAccountNumber++;
@@ -558,7 +569,6 @@ namespace Project0
                 Balance = amount,
                 Term = years,
                 Maturity = DateTime.Now.AddYears(years),
-                //Maturity = DateTime.Now,
                 isActive = true,
                 InterestRate = 0.10,
                 Transactions = new List<Transaction>(),
@@ -665,13 +675,13 @@ namespace Project0
                 CustomerHomeScreen();
             }
         }
-        private static void CheckLoanType(int accountnumber, ScreenDelegate del)
+        private static void CheckLoanType(int accountnumber)
         {
             if (AccountSelector(accountnumber) is Loan)
             {
                 Console.WriteLine("You cannot transfer from or to a loan. Try again.");
                 Thread.Sleep(2000);
-                del();
+                CustomerHomeScreen();
             }
         }
         private static void CheckNumberOfAccounts()
