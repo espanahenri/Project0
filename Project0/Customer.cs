@@ -10,9 +10,7 @@ namespace Project0
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public bool isActive { get; set; }
-
         public List<IAccount> Accounts = new List<IAccount>();
-        public List<Loan> Loans { get; set; }
         public decimal OverdraftFacilityDue { get; set; }
         
     }

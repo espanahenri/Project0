@@ -14,6 +14,7 @@ namespace Project0
         public int Term { get; set; }
         public List<Transaction> Transactions { get; set; }
         public bool isActive { get; set; }
+        public int CustomerID { get; set; }
         public void PayLoanInstallment(decimal amount)
         {
             FullBalance -= amount;  

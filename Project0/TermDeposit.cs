@@ -14,6 +14,7 @@ namespace Project0
         public decimal FullBalance { get; set; }
         public bool isActive { get; set; }
         public List<Transaction> Transactions { get; set; }
+        public int CustomerID { get; set; }
         public void Deposit(decimal amount)
         {
             FullBalance += (decimal)((double)amount * (InterestRate * Term));

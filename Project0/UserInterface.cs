@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using System.Linq;
+using System.Text.RegularExpressions;
+
 namespace Project0
 {
     public delegate void ScreenDelegate();
@@ -15,17 +17,16 @@ namespace Project0
     public static class UserInterface
     {
         public static int _TransactionID = 5000;
-        public static int _LoanID = 4000; 
+        public static int _LoanID = 4000;
         private static int _CustomerID = 1000;
         private static int _TermDepositID = 6000;
         private static List<Customer> _Customers = new List<Customer>();
-        public static List<IAccount> transferlist = new List<IAccount>();
         private static int _CheckingAccountNumber = 2000;
         private static int _BusinessAccountNumber = 3000;
         public static Customer _CurrentCustomer = new Customer();
-        enum _OpenAccountSelector { Checking=1, Business=2, Loan=3,TermDeposit=4 };
-        enum _HomeScreenSelector 
-        { 
+        enum _OpenAccountSelector { Checking = 1, Business = 2, Loan = 3, TermDeposit = 4 };
+        enum _HomeScreenSelector
+        {
             Register = 1,
             OpenNewAccount = 2,
             CloseAccount = 3,
@@ -42,21 +43,22 @@ namespace Project0
         #region Register Page
         public static void RegisterScreen()
         {
-            Console.Clear();    
+            Console.Clear();
             Console.WriteLine("Welcome to Revature Bank");
             Console.WriteLine("Please Register Now: ");
             Console.WriteLine("First Name: ");
             var firstname = Console.ReadLine();
-            while (string.IsNullOrEmpty(firstname))
+
+            while (!(Regex.IsMatch(firstname, @"^[a-zA-Z]+$")) || string.IsNullOrEmpty(firstname))
             {
-                Console.WriteLine("Name can't be empty! Input your name once more");
-                firstname = Console.ReadLine();
+                Console.WriteLine("First name can't be empty or a number! Input your name once more");
+                firstname = Console.ReadLine(); 
             }
             Console.WriteLine("Last Name: ");
             var lastname = Console.ReadLine();
-            while (string.IsNullOrEmpty(lastname))
+            while (!(Regex.IsMatch(lastname, @"^[a-zA-Z]+$")) || string.IsNullOrEmpty(lastname))
             {
-                Console.WriteLine("Name can't be empty! Input your name once more");
+                Console.WriteLine("First name can't be empty or a number! Input your name once more");
                 lastname = Console.ReadLine();
             }
             Console.WriteLine("Thank you for Registering, Welcome to our bank!");
@@ -71,12 +73,12 @@ namespace Project0
             _CurrentCustomer = customer;
             _CustomerID++;
             OpenAccountScreen();
-            
+
         }
         #endregion
         public static void CustomerHomeScreen()
         {
-            
+
             Console.Clear();
             Console.WriteLine($"Welcome to Revature Bank { _CurrentCustomer.FirstName } { _CurrentCustomer.LastName }!");
             Console.WriteLine("1. Register");
@@ -160,7 +162,7 @@ namespace Project0
                 case (int)_OpenAccountSelector.Checking:
                     OpenCheckingAccount();
                     break;
-                
+
                 case (int)_OpenAccountSelector.Business:
                     OpenBusinessAccount();
                     break;
@@ -177,7 +179,7 @@ namespace Project0
                     break;
             }
         }
-        
+
         public static void DepositScreen()
         {
             Console.Clear();
@@ -190,7 +192,7 @@ namespace Project0
             DisplayAllCustomerAccounts();
             Console.WriteLine("Please type in account number you want to deposit in to.");
             var input = Console.ReadLine();
-            IntegerNumberVerifier(input, out accountnumber,del);
+            IntegerNumberVerifier(input, out accountnumber, del);
             AccountNumberExist(accountnumber, del);
             CheckLoanType(accountnumber);
             if (AccountSelector(accountnumber) is TermDeposit)
@@ -220,10 +222,10 @@ namespace Project0
             }
             account.Transactions.Add(trans);
             _TransactionID++;
-            Console.WriteLine($"Thank you, your deposit of ${amount} for account: {account.AccountNumber } was successful");
+            Console.WriteLine($"Thank you, your deposit of ${amount.ToString("F")} for account: {account.AccountNumber } was successful");
             Console.WriteLine("Please press enter to go back home.");
             Console.ReadLine();
-            CustomerHomeScreen();     
+            CustomerHomeScreen();
         }
         public static void WithdrawScreen()
         {
@@ -265,7 +267,7 @@ namespace Project0
             }
             account.Transactions.Add(trans);
             _TransactionID++;
-            Console.WriteLine($"Thank you, your withdraw of ${amount} for account: {account.AccountNumber } was successful");
+            Console.WriteLine($"Thank you, your withdraw of ${amount.ToString("F")} for account: {account.AccountNumber } was successful");
             Console.WriteLine("Please press enter to go back home.");
             Console.ReadLine();
             CustomerHomeScreen();
@@ -276,7 +278,7 @@ namespace Project0
             int accountnumber;
             var del = new ScreenDelegate(CloseAccountScreen);
             CheckAccountsExist();
-            
+
             Console.WriteLine("+++Close Account+++");
             DisplayAllCustomerAccounts();
             Console.WriteLine("Type in the account number you want to close");
@@ -303,10 +305,10 @@ namespace Project0
             Console.Clear();
             decimal amount;
             var del = new ScreenDelegate(PayOverdraftScreen);
-            if (_CurrentCustomer.OverdraftFacilityDue > 0) 
+            if (_CurrentCustomer.OverdraftFacilityDue > 0)
             {
                 Console.WriteLine("+++Pay Overdraft Facility+++");
-                Console.WriteLine($"This is how much you owe: ${ _CurrentCustomer.OverdraftFacilityDue}");
+                Console.WriteLine($"This is how much you owe: ${ _CurrentCustomer.OverdraftFacilityDue.ToString("F")}");
                 Console.WriteLine("How much would you like to pay?");
                 var input = Console.ReadLine();
                 VerifyAmount(input, out amount, del);
@@ -466,18 +468,18 @@ namespace Project0
         {
             Console.Clear();
             Console.WriteLine($"{ _CurrentCustomer.FirstName }, these are your accounts.");
-            
+
             Console.WriteLine("         +++Checking Accounts+++");
             foreach (var account in _CurrentCustomer.Accounts.OfType<CheckingAccount>())
             {
-                Console.WriteLine($"Account Number: { account.AccountNumber } Balance: ${ account.Balance } " +
+                Console.WriteLine($"Account Number: { account.AccountNumber } Balance: ${ account.Balance.ToString("F") } " +
                                   $"Current Interest Rate: { account.InterestRate }");
             }
             Console.WriteLine();
             Console.WriteLine("         +++Business Accounts+++");
             foreach (var account in _CurrentCustomer.Accounts.OfType<BusinessAccount>())
             {
-                Console.WriteLine($"Account Number: { account.AccountNumber } Balance: ${ account.Balance } " +
+                Console.WriteLine($"Account Number: { account.AccountNumber } Balance: ${ account.Balance.ToString("F") } " +
                                   $"Current Interest Rate: { account.InterestRate }");
             }
             Console.WriteLine();
@@ -491,7 +493,7 @@ namespace Project0
             Console.WriteLine("         +++Term Deposit Accounts+++");
             foreach (var account in _CurrentCustomer.Accounts.OfType<TermDeposit>())
             {
-                Console.WriteLine($"Account Number: { account.AccountNumber } Balance: ${ account.FullBalance } " +
+                Console.WriteLine($"Account Number: { account.AccountNumber } Balance: ${ account.FullBalance.ToString("F") } " +
                                   $"Interest Rate: { account.InterestRate * 100 }% Term: {account.Term}years Maturity Date: {account.Maturity}");
             }
             Console.WriteLine();
@@ -509,7 +511,7 @@ namespace Project0
             DisplayAllCustomerAccounts();
             Console.WriteLine("Please select the account you want to see the transactions for.");
             var input = Console.ReadLine();
-            IntegerNumberVerifier(input,out accountnumber, del);
+            IntegerNumberVerifier(input, out accountnumber, del);
             AccountNumberExist(accountnumber, del);
             var account = AccountSelector(accountnumber);
             foreach (var transaction in account.Transactions)
@@ -529,9 +531,10 @@ namespace Project0
                 Balance = 0.0M,
                 InterestRate = 0.0,
                 isActive = true,
+                CustomerID = _CurrentCustomer.ID,
                 Transactions = new List<Transaction>()
             };
-            
+
             _CurrentCustomer.Accounts.Add(account);
             _BusinessAccountNumber++;
             CustomerHomeScreen();
@@ -544,6 +547,7 @@ namespace Project0
                 Balance = 0.0M,
                 InterestRate = 0.0,
                 isActive = true,
+                CustomerID = _CurrentCustomer.ID,
                 Transactions = new List<Transaction>()
             };
             _CurrentCustomer.Accounts.Add(account);
@@ -571,6 +575,7 @@ namespace Project0
                 Maturity = DateTime.Now.AddYears(years),
                 isActive = true,
                 InterestRate = 0.10,
+                CustomerID = _CurrentCustomer.ID,
                 Transactions = new List<Transaction>(),
             };
             account.Deposit(amount);
@@ -610,19 +615,19 @@ namespace Project0
                 Term = years,
                 isActive = true,
                 InterestRate = 0.10,
-                Transactions = new List<Transaction>() 
+                CustomerID = _CurrentCustomer.ID,
+                Transactions = new List<Transaction>()
             };
             account.FullBalance = amount + (decimal)((double)amount * account.InterestRate);
-            account.InstallmentAmount = (decimal)(account.FullBalance / (account.Term*12));
+            account.InstallmentAmount = (decimal)(account.FullBalance / (account.Term * 12));
             _CurrentCustomer.Accounts.Add(account);
             _LoanID++;
-            Console.WriteLine($"You have taken out a new loan for ${account.Balance} with a monthly payment " +
+            Console.WriteLine($"You have taken out a new loan for ${account.Balance.ToString("F")} with a monthly payment " +
                 $"of ${account.InstallmentAmount.ToString("F")} for {account.Term} years.");
             Console.WriteLine("Press enter to go back home");
             Console.ReadLine();
             CustomerHomeScreen();
         }
-
         private static void CloseAccount(int accountnumber)
         {
             var account = AccountSelector(accountnumber);
@@ -630,21 +635,21 @@ namespace Project0
         }
         public static void DisplayAllCustomerAccounts()
         {
-                Console.WriteLine($"{ _CurrentCustomer.FirstName }, these are your accounts.");
-                
-                Console.WriteLine("         +++Checking Accounts+++");
-                foreach (var account in _CurrentCustomer.Accounts.OfType<CheckingAccount>())
-                {
-                    Console.WriteLine($"Account Number: { account.AccountNumber } Balance: ${ account.Balance } " +
-                                      $"Current Interest Rate: { account.InterestRate }");
-                }
+            Console.WriteLine($"{ _CurrentCustomer.FirstName }, these are your accounts.");
+
+            Console.WriteLine("         +++Checking Accounts+++");
+            foreach (var account in _CurrentCustomer.Accounts.OfType<CheckingAccount>())
+            {
+                Console.WriteLine($"Account Number: { account.AccountNumber } Balance: ${ account.Balance.ToString("F") } " +
+                                  $"Current Interest Rate: { account.InterestRate }");
+            }
             Console.WriteLine();
-                Console.WriteLine("         +++Business Accounts+++");
-                foreach (var account in _CurrentCustomer.Accounts.OfType<BusinessAccount>())
-                {
-                    Console.WriteLine($"Account Number: { account.AccountNumber } Balance: ${ account.Balance } " +
-                                      $"Current Interest Rate: { account.InterestRate }");
-                }
+            Console.WriteLine("         +++Business Accounts+++");
+            foreach (var account in _CurrentCustomer.Accounts.OfType<BusinessAccount>())
+            {
+                Console.WriteLine($"Account Number: { account.AccountNumber } Balance: ${ account.Balance.ToString("F") } " +
+                                  $"Current Interest Rate: { account.InterestRate }");
+            }
             Console.WriteLine();
             Console.WriteLine("         +++Loan Accounts+++");
             foreach (var account in _CurrentCustomer.Accounts.OfType<Loan>())
@@ -654,11 +659,11 @@ namespace Project0
             }
             Console.WriteLine();
             Console.WriteLine("         +++Term Deposit Accounts+++");
-                foreach (var account in _CurrentCustomer.Accounts.OfType<TermDeposit>())
-                {
-                    Console.WriteLine($"Account Number: { account.AccountNumber } Balance: ${ account.FullBalance } " +
-                                      $"Interest Rate: { account.InterestRate * 100 }% Term: {account.Term} years Maturity Date: {account.Maturity}");
-                }
+            foreach (var account in _CurrentCustomer.Accounts.OfType<TermDeposit>())
+            {
+                Console.WriteLine($"Account Number: { account.AccountNumber } Balance: ${ account.FullBalance.ToString("F") } " +
+                                  $"Interest Rate: { account.InterestRate * 100 }% Term: {account.Term} years Maturity Date: {account.Maturity}");
+            }
 
         }
         public static IAccount AccountSelector(int accountnumber)
@@ -699,14 +704,14 @@ namespace Project0
         private static void CheckNumberOfLoanAccounts()
         {
             var numofloanaccounts = _CurrentCustomer.Accounts.OfType<Loan>().Count();
-            if( numofloanaccounts < 1)
+            if (numofloanaccounts < 1)
             {
                 Console.WriteLine("You dont have any loans at this time.");
                 Thread.Sleep(2000);
                 CustomerHomeScreen();
             }
         }
-        private static void VerifyAmount(string input, out decimal amount,ScreenDelegate del)
+        private static void VerifyAmount(string input, out decimal amount, ScreenDelegate del)
         {
             bool checknumber = Decimal.TryParse(input, out amount);
             if (amount < 0)
@@ -725,7 +730,7 @@ namespace Project0
         private static void IntegerNumberVerifier(string input, out int accountnumber, ScreenDelegate del)
         {
             bool checknumber = int.TryParse(input, out accountnumber);
-            if (checknumber == false )
+            if (checknumber == false)
             {
                 Console.WriteLine("Not a correct value. Try again");
                 Thread.Sleep(2000);
@@ -734,7 +739,7 @@ namespace Project0
         }
         public static void AccountNumberExist(int accountnumber, ScreenDelegate del)
         {
-                
+
             if (!(_CurrentCustomer.Accounts.Any(account => account.AccountNumber == accountnumber)))
             {
                 Console.WriteLine("Account number not found. Try again.");
@@ -751,5 +756,5 @@ namespace Project0
                 del();
             }
         }
-    }      
+    }  
 }
